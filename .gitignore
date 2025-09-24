@@ -1,3 +1,28 @@
+# Ambiente virtual
 venv/
+env/
 
+# Arquivos de variáveis de ambiente
 .env
+*.env
+
+# Cache do Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+
+# Logs
+*.log
+
+# Arquivos temporários
+*.tmp
+*.swp
+*.swo
+
+# Configs de IDEs
+.vscode/
+.idea/
+*.iml
