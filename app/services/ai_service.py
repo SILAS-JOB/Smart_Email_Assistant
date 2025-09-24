@@ -9,7 +9,6 @@ if not API_KEY:
 
 # --- Modelos ---
 MODELO_CLASSIFICACAO = 'facebook/bart-large-mnli'
-# Vamos usar o Mistral, que é excelente e agora sabemos como usá-lo corretamente.
 MODELO_GERACAO = 'mistralai/Mistral-7B-Instruct-v0.2'
 
 # --- Cliente Oficial da API ---
@@ -36,27 +35,23 @@ def _generate_response_text(email_text, category):
     print(f"--- Gerando resposta com o modelo (modo Chat): {MODELO_GERACAO} ---")
     
     if category == "Produtivo":
-        # Montamos o prompt no formato de 'Chat Completion'
         system_prompt = "Você é um assistente de e-mail profissional que escreve respostas curtas e úteis em português."
         user_prompt = f"Escreva uma resposta para o seguinte e-mail:\n\n{email_text}"
     else:
         system_prompt = "Você é um assistente de e-mail amigável que escreve respostas muito curtas e simpáticas em português."
         user_prompt = f"Escreva uma resposta para o seguinte e-mail:\n\n{email_text}"
     
-    # Formato de mensagens que a API de chat espera
     messages = [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_prompt},
     ]
 
     try:
-        # A chamada correta para modelos de conversação: client.chat_completion
         resposta_gerada = client.chat_completion(
             messages,
             model=MODELO_GERACAO,
-            max_tokens=100, # Para chat, o parâmetro é 'max_tokens'
+            max_tokens=100, 
         )
-        # A resposta vem em um objeto diferente
         conteudo_resposta = resposta_gerada.choices[0].message.content
         print(f"Resposta da Geração: {conteudo_resposta}")
         return conteudo_resposta.strip()

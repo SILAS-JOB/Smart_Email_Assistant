@@ -1,56 +1,93 @@
-    <!DOCTYPE html>
-    <html lang="pt-br">
-    <head>
-        <meta charset="UTF-8">
-        <title>Smart Email Assistant</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    </head>
-    <body>
-        <h1>Assistente Inteligente de E-mails</h1>
-        <form id="email-form">
-            <label for="email-text">Cole o texto do e-mail abaixo:</label>
-            <br>
-            <textarea id="email-text" name="email-text" required></textarea>
-            <br><br>
-            <button type="submit">Analisar E-mail</button>
-        </form>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Email Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h1>Assistente Inteligente de E-mails</h1>
+    <form id="email-form">
+        <label for="email-text">Cole o texto do e-mail abaixo:</label>
+        <br>
+        <textarea id="email-text" name="email-text"></textarea>
+        <br>
+        <p><strong>OU</strong></p>
+        <label for="email-file">Faça o upload de um arquivo (.txt ou .pdf):</label>
+        <br>
+        <input type="file" id="email-file" name="email-file" accept=".txt,.pdf">
+        <br><br>
+        <button type="submit" id="submit-button">Analisar E-mail</button>
+    </form>
 
-        <div id="results" style="display:none;">
-            <h2>Resultado da Análise</h2>
-            <p><strong>Categoria:</strong> <span id="category"></span></p>
-            <p><strong>Resposta Sugerida:</strong> <span id="suggested-response"></span></p>
-        </div>
+    <div id="loader" style="display:none;">
+        <p>Analisando, por favor aguarde...</p>
+    </div>
 
-        <script>
-    const form = document.getElementById('email-form');
-    const resultsDiv = document.getElementById('results');
-    const categorySpan = document.getElementById('category');
-    const suggestedResponseSpan = document.getElementById('suggested-response');
-    const emailTextArea = document.getElementById('email-text');
+    <div id="results" style="display:none;">
+        <h2>Resultado da Análise</h2>
+        <p><strong>Categoria:</strong> <span id="category"></span></p>
+        <p><strong>Resposta Sugerida:</strong></p>
+        <pre id="suggested-response"></pre>
+        <button id="copy-button">Copiar Resposta</button>
+    </div>
 
-    form.addEventListener('submit', function(event) {
-        event.preventDefault();
+    <script>
+        const form = document.getElementById('email-form');
+        const submitButton = document.getElementById('submit-button');
+        const loader = document.getElementById('loader');
+        const resultsDiv = document.getElementById('results');
+        const categorySpan = document.getElementById('category');
+        const suggestedResponsePre = document.getElementById('suggested-response');
+        const copyButton = document.getElementById('copy-button');
 
-        const emailText = emailTextArea.value;
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
 
-        fetch('/classify', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ text: emailText }),
-        })
-        .then(response => response.json()) 
-        .then(data => {
-            categorySpan.textContent = data.category;
-            suggestedResponseSpan.textContent = data.suggested_response;
-            resultsDiv.style.display = 'block'; 
-        })
-        .catch(error => {
-            console.error('Erro:', error);
-            alert('Ocorreu um erro ao analisar o e-mail.');
+            // Mostra o loader e esconde resultados antigos
+            submitButton.disabled = true;
+            loader.style.display = 'block';
+            resultsDiv.style.display = 'none';
+
+            // FormData é a forma correta de enviar formulários com arquivos
+            const formData = new FormData(form);
+
+            fetch('/classify', {
+                method: 'POST',
+                body: formData, // Não precisa de headers, o navegador cuida disso com FormData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('A resposta da rede não foi OK');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Exibe os resultados
+                categorySpan.textContent = data.category;
+                suggestedResponsePre.textContent = data.suggested_response;
+                resultsDiv.style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Ocorreu um erro ao analisar o e-mail. Veja o console para detalhes.');
+            })
+            .finally(() => {
+                // Esconde o loader e reativa o botão
+                submitButton.disabled = false;
+                loader.style.display = 'none';
+            });
         });
-    });
-        </script>
-    </body>
-    </html>
+
+        copyButton.addEventListener('click', function() {
+            navigator.clipboard.writeText(suggestedResponsePre.textContent)
+                .then(() => {
+                    alert('Resposta copiada para a área de transferência!');
+                })
+                .catch(err => {
+                    console.error('Erro ao copiar texto: ', err);
+                });
+        });
+    </script>
+</body>
+</html>
