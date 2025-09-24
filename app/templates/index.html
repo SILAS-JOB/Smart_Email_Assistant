@@ -3,9 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <title>Smart Email Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <h1>Olá Mundo do Flask!</h1>
-    <p>Se você está vendo isso, seu servidor está funcionando.</p>
+    <h1>Assistente Inteligente de E-mails</h1>
+    <form id="email-form">
+        <label for="email-text">Cole o texto do e-mail abaixo:</label>
+        <br>
+        <textarea id="email-text" name="email-text" required></textarea>
+        <br><br>
+        <button type="submit">Analisar E-mail</button>
+    </form>
+
+    <div id="results" style="display:none;">
+        <h2>Resultado da Análise</h2>
+        <p><strong>Categoria:</strong> <span id="category"></span></p>
+        <p><strong>Resposta Sugerida:</strong> <span id="suggested-response"></span></p>
+    </div>
+
+    <script>
+const form = document.getElementById('email-form');
+const resultsDiv = document.getElementById('results');
+const categorySpan = document.getElementById('category');
+const suggestedResponseSpan = document.getElementById('suggested-response');
+const emailTextArea = document.getElementById('email-text');
+
+form.addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const emailText = emailTextArea.value;
+
+    fetch('/classify', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: emailText }),
+    })
+    .then(response => response.json()) 
+    .then(data => {
+        categorySpan.textContent = data.category;
+        suggestedResponseSpan.textContent = data.suggested_response;
+        resultsDiv.style.display = 'block'; 
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Ocorreu um erro ao analisar o e-mail.');
+    });
+});
+    </script>
 </body>
 </html>
