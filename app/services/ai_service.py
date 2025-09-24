@@ -1,63 +1,68 @@
-import requests
 import os
+from huggingface_hub import InferenceClient
 
 # --- Configuração ---
 API_KEY = os.environ.get("HUGGING_FACE_API_KEY")
 
-# Adicionando um check de segurança para garantir que a chave foi carregada.
 if not API_KEY:
-    raise ValueError("A chave HUGGING_FACE_API_KEY não foi encontrada no ambiente. Verifique seu arquivo .env")
+    raise ValueError("A chave HUGGING_FACE_API_KEY não foi encontrada. Verifique seu arquivo .env")
 
-# Modelos escolhidos por você, que são ótimos!
-IDENTIFICADOR_CLASSIFICACAO = 'facebook/bart-large-mnli'
-IDENTIFICADOR_GERACAO = 'distilgpt2' 
+# --- Modelos ---
+MODELO_CLASSIFICACAO = 'facebook/bart-large-mnli'
+# Vamos usar o Mistral, que é excelente e agora sabemos como usá-lo corretamente.
+MODELO_GERACAO = 'mistralai/Mistral-7B-Instruct-v0.2'
 
-CLASSIFICATION_API_URL = f"https://api-inference.huggingface.co/models/{IDENTIFICADOR_CLASSIFICACAO}"
-GENERATION_API_URL = f"https://api-inference.huggingface.co/models/{IDENTIFICADOR_GERACAO}"
+# --- Cliente Oficial da API ---
+client = InferenceClient(token=API_KEY)
 
-headers = {"Authorization": f"Bearer {API_KEY}"}
-
-
-def _call_api(payload, url):
-    """Função genérica para fazer a chamada à API e tratar a resposta."""
-    print(f"Enviando para URL: {url}")
-    response = requests.post(url, headers=headers, json=payload)
-    return response
 
 def _classify_text(text):
-    """Chama a API de classificação para determinar a categoria do e-mail."""
-    payload = {
-        "inputs": text,
-        "parameters": {"candidate_labels": ["Produtivo", "Improdutivo"]},
-    }
-    response_obj = _call_api(payload, CLASSIFICATION_API_URL)
-    
-    if response_obj.status_code != 200:
-        print(f"!!! Erro na API de Classificação ({response_obj.status_code}): {response_obj.text}")
+    """Chama a API de classificação usando o cliente oficial."""
+    print(f"--- Classificando com o modelo: {MODELO_CLASSIFICACAO} ---")
+    try:
+        resultado = client.zero_shot_classification(
+            text,
+            candidate_labels=["Produtivo", "Improdutivo"],
+            model=MODELO_CLASSIFICACAO
+        )
+        print(f"Resposta da Classificação: {resultado}")
+        return resultado[0].label
+    except Exception as e:
+        print(f"!!! Erro na API de Classificação: {e}")
         return "Erro de Classificação"
-        
-    response_json = response_obj.json()
-    print(f"Resposta da Classificação: {response_json}")
-    return response_json['labels'][0]
 
 def _generate_response_text(email_text, category):
-    """Chama a API de geração de texto para criar uma resposta sugerida."""
+    """Chama a API de geração de texto usando a tarefa 'conversational'."""
+    print(f"--- Gerando resposta com o modelo (modo Chat): {MODELO_GERACAO} ---")
+    
     if category == "Produtivo":
-        prompt = f"Escreva uma resposta profissional curta em português para o seguinte e-mail:\n\nE-mail: \"{email_text}\"\n\nResposta:"
+        # Montamos o prompt no formato de 'Chat Completion'
+        system_prompt = "Você é um assistente de e-mail profissional que escreve respostas curtas e úteis em português."
+        user_prompt = f"Escreva uma resposta para o seguinte e-mail:\n\n{email_text}"
     else:
-        prompt = f"Escreva uma resposta amigável e muito curta em português para o seguinte e-mail:\n\nE-mail: \"{email_text}\"\n\nResposta:"
+        system_prompt = "Você é um assistente de e-mail amigável que escreve respostas muito curtas e simpáticas em português."
+        user_prompt = f"Escreva uma resposta para o seguinte e-mail:\n\n{email_text}"
     
-    payload = { "inputs": prompt, "parameters": { "max_new_tokens": 100, "temperature": 0.7 } }
-    
-    response_obj = _call_api(payload, GENERATION_API_URL)
+    # Formato de mensagens que a API de chat espera
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt},
+    ]
 
-    if response_obj.status_code != 200:
-        print(f"!!! Erro na API de Geração ({response_obj.status_code}): {response_obj.text}")
-        return f"Erro na geração da resposta."
-
-    response_json = response_obj.json()
-    print(f"Resposta da Geração: {response_json}")
-    return response_json[0]['generated_text'].replace(prompt, "").strip()
+    try:
+        # A chamada correta para modelos de conversação: client.chat_completion
+        resposta_gerada = client.chat_completion(
+            messages,
+            model=MODELO_GERACAO,
+            max_tokens=100, # Para chat, o parâmetro é 'max_tokens'
+        )
+        # A resposta vem em um objeto diferente
+        conteudo_resposta = resposta_gerada.choices[0].message.content
+        print(f"Resposta da Geração: {conteudo_resposta}")
+        return conteudo_resposta.strip()
+    except Exception as e:
+        print(f"!!! Erro na API de Geração: {e}")
+        return "Erro na geração da resposta."
 
 def get_email_analysis(text):
     """Função principal que orquestra a análise do e-mail."""
