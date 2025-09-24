@@ -44,17 +44,15 @@
         form.addEventListener('submit', function(event) {
             event.preventDefault();
 
-            // Mostra o loader e esconde resultados antigos
             submitButton.disabled = true;
             loader.style.display = 'block';
             resultsDiv.style.display = 'none';
 
-            // FormData é a forma correta de enviar formulários com arquivos
             const formData = new FormData(form);
 
             fetch('/classify', {
                 method: 'POST',
-                body: formData, // Não precisa de headers, o navegador cuida disso com FormData
+                body: formData, 
             })
             .then(response => {
                 if (!response.ok) {
@@ -73,7 +71,6 @@
                 alert('Ocorreu um erro ao analisar o e-mail. Veja o console para detalhes.');
             })
             .finally(() => {
-                // Esconde o loader e reativa o botão
                 submitButton.disabled = false;
                 loader.style.display = 'none';
             });
