@@ -26,7 +26,7 @@
 
     <div id="results" style="display:none;">
         <h2>Resultado da Análise</h2>
-        <p><strong>Categoria:</strong> <span id="category"></span></p>
+        <p><strong>Categoria:</strong> <span id="category"></span> (Confiança: <span id="confidence-score"></span>)</p>        
         <p><strong>Resposta Sugerida:</strong></p>
         <pre id="suggested-response"></pre>
         <button id="copy-button">Copiar Resposta</button>
@@ -38,6 +38,7 @@
         const loader = document.getElementById('loader');
         const resultsDiv = document.getElementById('results');
         const categorySpan = document.getElementById('category');
+        const confidenceScoreSpan = document.getElementById('confidence-score');
         const suggestedResponsePre = document.getElementById('suggested-response');
         const copyButton = document.getElementById('copy-button');
 
@@ -56,13 +57,15 @@
             })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('A resposta da rede não foi OK');
+                    throw new Error('A resposta da rede não foi 200');
                 }
                 return response.json();
             })
             .then(data => {
                 // Exibe os resultados
                 categorySpan.textContent = data.category;
+                const confidencePercentage = (data.score * 100).toFixed(1);
+                confidenceScoreSpan.textContent = `${confidencePercentage}%`;
                 suggestedResponsePre.textContent = data.suggested_response;
                 resultsDiv.style.display = 'block';
             })
