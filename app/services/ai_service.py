@@ -1,5 +1,8 @@
 import os
 from huggingface_hub import InferenceClient
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
 
 
 # --- Configuração ---
@@ -90,9 +93,18 @@ def _generate_response_text(email_text, category):
         print(f"!!! Erro na API de Geração: {e}")
         return "Erro na geração da resposta."
 
+
+def _remove_stopwords(text):
+    """Remove palavras comuns de um texto em português."""
+    stop_words = set(stopwords.words('portuguese'))
+    word_tokens = word_tokenize(text)
+    texto_filtrado = [palavra for palavra in word_tokens if palavra.lower() not in stop_words]
+    return " ".join(texto_filtrado)
+
 def get_email_analysis(text):
     """Função principal que orquestra a análise do e-mail."""
-    category, score = _classify_text(text)
+    texto_processado = _remove_stopwords(text)
+    category, score = _classify_text(texto_processado)
     
     if "Erro" in category:
         return {'category': category, 'suggested_response': 'Falha na primeira etapa.'}
