@@ -1,2 +1,2 @@
 web: gunicorn run:app 
-#Comando pra startar no render
+#Comando para subir aplicação no render
