@@ -4,7 +4,7 @@ Aplicação web que utiliza Inteligência Artificial para classificar e-mails, o
 
 Este projeto foi desenvolvido como o case prático para o processo seletivo de Desenvolvedor da AutoU.
 
-🚀 Acesse a Aplicação ao Vivo: [COLOQUE AQUI O LINK DO SEU APP NO RENDER.COM]
+🚀 Acesse a Aplicação ao Vivo: https://emailassistant-5es5.onrender.com/
 
 🎬 Demonstração
 
@@ -12,21 +12,6 @@ A interface permite a análise de texto inserido diretamente ou através do uplo
 
 [ADICIONE AQUI UM SCREENSHOT OU UM GIF DA SUA APLICAÇÃO FUNCIONANDO]
 
-📋 Índice
-
-    Sobre o Projeto
-
-    Funcionalidades
-
-    Tecnologias Utilizadas
-
-    Arquitetura e Decisões Técnicas
-
-    Como Rodar o Projeto Localmente
-
-    Deploy
-
-    Licença
 
 📖 Sobre o Projeto
 
@@ -91,8 +76,8 @@ Siga os passos abaixo para configurar e executar a aplicação em seu ambiente l
     Clone o repositório:
     Bash
 
-git clone [COLOQUE AQUI A URL DO SEU REPOSITÓRIO GIT]
-cd [NOME-DA-PASTA-DO-PROJETO]
+git clone https://github.com/SILAS-JOB/Smart_Email_Assistant.git
+cd Smart_Email_Assistant
 
 Crie e ative um ambiente virtual:
 Bash
@@ -131,3 +116,4 @@ A aplicação está hospedada na plataforma Render, configurada para deploy cont
 📄 Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
+
