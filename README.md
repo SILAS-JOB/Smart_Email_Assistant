@@ -6,12 +6,6 @@ Este projeto foi desenvolvido como o case prático para o processo seletivo de D
 
 🚀 Acesse a Aplicação ao Vivo: https://emailassistant-5es5.onrender.com/
 
-🎬 Demonstração
-
-A interface permite a análise de texto inserido diretamente ou através do upload de arquivos .txt e .pdf. O resultado exibe a categoria, a confiança da IA e uma resposta sugerida.
-
-[ADICIONE AQUI UM SCREENSHOT OU UM GIF DA SUA APLICAÇÃO FUNCIONANDO]
-
 
 📖 Sobre o Projeto
 
@@ -116,4 +110,5 @@ A aplicação está hospedada na plataforma Render, configurada para deploy cont
 📄 Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
+
 
