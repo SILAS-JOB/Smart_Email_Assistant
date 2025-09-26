@@ -1,3 +1,4 @@
+import nltk
 from dotenv import load_dotenv
 
 try:
@@ -5,9 +6,10 @@ try:
     nltk.data.find('corpora/stopwords')
     nltk.data.find('tokenizers/punkt')
     print("Pacotes NLTK já existem.")
-except nltk.downloader.DownloadError:
+except LookupError:
     print("Baixando pacotes NLTK necessários...")
     nltk.download('popular')
+    nltk.download('stopwords')
     print("Download dos pacotes NLTK concluído.")
 
 load_dotenv()
