@@ -22,7 +22,7 @@ def _classify_text(text):
     print(f"--- Classificando com o modelo: {MODELO_CLASSIFICACAO} ---")
     prompt_com_exemplos = f"""
         Você é um assistente de escritório inteligente que classifica e-mails. A tarefa é categorizar o "Email do Usuário" como "Produtivo" ou "Improdutivo".
-
+        Qualquer coisa que não esteja relacionada com trabalho e a vida no escritório será dita como improdutiva, pois separam a atenção do funcionário
         Aqui estão alguns exemplos:
 
         - Exemplo de email produtivo: "Bom dia, por favor, verifique a planilha de vendas do último trimestre."
